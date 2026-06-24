@@ -1,0 +1,42 @@
+# Beatex — ignore everything heavy, generated, or machine-local.
+
+# Cloned model repo (multi-GB: its own git repo + venv + downloaded weights)
+external/
+
+# Generated beatmaps, intermediate .osu, copied audio, test/UI outputs
+data/
+
+# Virtual environments
+.venv/
+.venv-*/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Audio / beatmap artifacts — never commit songs or maps
+*.mp3
+*.wav
+*.ogg
+*.m4a
+*.flac
+*.osu
+*.osz
+
+# Obsidian per-user vault config
+docs/.obsidian/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
