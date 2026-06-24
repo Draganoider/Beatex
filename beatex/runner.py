@@ -43,11 +43,13 @@ def run_inference(
 
     before = _osu_names(output_dir)
 
-    # Single-quote path values so Hydra accepts spaces; forward slashes avoid
-    # backslash-escaping surprises (Windows Python opens them fine).
+    # Double-quote path values so Hydra accepts spaces AND apostrophes in
+    # filenames (e.g. "Don't"); single quotes get closed early by an apostrophe.
+    # Windows filenames can't contain `"`, so double-quoting is always safe here.
+    # Forward slashes avoid backslash-escaping surprises (Windows opens them fine).
     overrides = [
-        f"audio_path='{audio_path.as_posix()}'",
-        f"output_path='{output_dir.as_posix()}'",
+        f'audio_path="{audio_path.as_posix()}"',
+        f'output_path="{output_dir.as_posix()}"',
         f"gamemode={gamemode}",
         f"difficulty={difficulty}",
         f"year={year}",
