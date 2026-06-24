@@ -6,6 +6,10 @@ tags: [beatex, decisions, log]
 
 Newest first. Each entry: what was decided, why, and what it rules out.
 
+## 2026-06-24 — Published to GitHub (public, MIT)
+**Outcome:** Live at https://github.com/Draganoider/Beatex (public, MIT), pushed via the gh CLI; remote `origin`, branch `main`. Initial commit + a fix for a Hydra crash on apostrophes in audio filenames (double-quote the override path values; Windows filenames can't contain `"`). `external/`, `data/`, and the venvs are gitignored, so no model weights and **none of the user's audio** are published. README badges + an Acknowledgements section credit Mapperatorinator (the upstream timing model) and mark Beatex as independent / not affiliated.
+**Convention:** commit messages follow the user's style — past-tense subject, no body, no trailers.
+
 ## 2026-06-23 — Beatex tool + UI built (package, CLI, Streamlit)
 **Outcome:** Implemented the actual extractor: a dependency-light `beatex` package (`schema`/`osu_parse`/`shape`/`runner`/`pipeline`/`cli`) that shells out to the isolated model venv and emits Unity-compatible `beatmap-v1` JSON; plus a Streamlit app (generate-once / shape-instantly) with an embedded wavesurfer.js waveform, Web-Audio click playback synced to the song, a density chart, and JSON export. Core validated on the existing `.osu`; full CLI run validated end-to-end (Rammstein – Sonne → 1093 events, 4.0 hits/s). Publish scaffolding (README, MIT LICENSE, .gitignore) added.
 **Why this shape:** core stays stdlib-only and calls the model via subprocess, so the heavy 3.10/torch env never contaminates the app; the slow model run is separated from instant shaping so UI tweaks are real-time. App deps live in their own `.venv` (3.12).

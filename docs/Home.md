@@ -7,7 +7,7 @@ tags: [beatex, moc]
 > **Map of Content. Start here.** This vault is the Beatex project wiki — how we turn any song into the "best possible" beatmap: the hit timings a human would *feel*, across drums, bass, vocals and melody.
 
 ## Status (2026-06-23)
-**Working tool + UI.** The full pipeline runs: `song → Mapperatorinator V32 (timing) → parse → shape → beatmap-v1 JSON`, as a dependency-light `beatex` package + CLI ([[architecture]]), validated end-to-end (Rammstein – Sonne → 1093 events at 4.0 hits/s). A **Streamlit UI** (`app/streamlit_app.py`) wraps it: generate once, shape instantly, wavesurfer waveform + synced click beeps, live density chart, JSON export. Env/runbook: [[model-setup]]. **Next:** tune default density/feel, then publish (git + GitHub).
+**Working tool + UI.** The full pipeline runs: `song → Mapperatorinator V32 (timing) → parse → shape → beatmap-v1 JSON`, as a dependency-light `beatex` package + CLI ([[architecture]]), validated end-to-end (Rammstein – Sonne → 1093 events at 4.0 hits/s). A **Streamlit UI** (`app/streamlit_app.py`) wraps it: generate once, shape instantly, wavesurfer waveform + synced click beeps, live density chart, JSON export. Env/runbook: [[model-setup]]. **Published** at https://github.com/Draganoider/Beatex (public, MIT). **Next:** tune default difficulty/density/feel from listening.
 
 ## The map
 - [[vision]] — what "best possible beatmap" means, and why naive beat-tracking isn't enough.
