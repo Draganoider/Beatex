@@ -15,6 +15,7 @@ dependencies = []
 
 [project.optional-dependencies]
 app = ["streamlit>=1.40", "pandas>=2.0", "numpy>=1.26", "pydub>=0.25"]
+gui = ["PyQt6>=6.6", "numpy>=1.26", "pydub>=0.25"]
 tools = ["numpy>=1.26", "pydub>=0.25"]
 
 [project.scripts]

@@ -88,6 +88,18 @@ re-run — so you can compare difficulties/years/seeds. Run data lives under
 `data/` (audio is content-addressed by sha256, so the same song isn't duplicated
 across runs).
 
+### Desktop app (no terminal)
+
+Install the GUI deps once, then **double-click `Beatex.bat`**:
+```sh
+uv pip install --python .venv -e ".[gui]"
+```
+A native **PyQt6** window opens — pick a song, **Generate** (runs on a background
+thread so the UI stays responsive), shape live, **Build & Play** a synced preview
+(clicks baked into one stream), and save the JSON or mp3. It shares the same
+**History** as the Streamlit app. To see startup errors, launch the console build:
+`.venv\Scripts\python app\qt_app.py`.
+
 ## Output: `beatmap-v1`
 
 ```json
