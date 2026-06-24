@@ -34,7 +34,7 @@ Result: `torch 2.12.1+cu130`, `torchaudio 2.11.0+cu130`. `torch.cuda.get_arch_li
 ## Run (timing map, positions skipped)
 `config_name="v32"` is the **default** in `inference.py`, and v32 already sets `generate_positions: false` (diffusion never runs) and `output_type: [TIMING, MAP, SV]`. Must run **from the repo directory**.
 ```powershell
-Set-Location "C:\My programs\Beatex\external\Mapperatorinator"
+Set-Location external\Mapperatorinator   # from the Beatex repo root
 & ".\.venv\Scripts\python.exe" inference.py audio_path="'<song>'" output_path="'<out dir>'" gamemode=0 difficulty=4 year=2021
 ```
 - Quote paths as `"'...'"` (outer double for PowerShell, inner single for Hydra) so spaces/backslashes survive.
@@ -45,7 +45,7 @@ Set-Location "C:\My programs\Beatex\external\Mapperatorinator"
 ## Inspect output
 `tools/inspect_osu.py` parses a generated `.osu` and prints count, type breakdown, a density histogram, and the first hit times:
 ```powershell
-& "<venv>\Scripts\python.exe" "C:\My programs\Beatex\tools\inspect_osu.py" "<the .osu>" --audio "<the song>"
+& ".venv\Scripts\python.exe" tools\inspect_osu.py "<the .osu>" --audio "<the song>"
 ```
 
 ## First test result — Rammstein – Sonne (difficulty=4, gamemode=0)

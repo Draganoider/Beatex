@@ -42,7 +42,7 @@ for k, v in dict(parsed=None, audio_bytes=None, audio_name=None, duration=0.0,
 if ss.get("flash"):
     st.success(ss.pop("flash"))
 
-DEFAULT_SONG = r"C:\Users\Draga\Music\SpookboxMixtape\Rammstein - Sonne.mp3"
+DEFAULT_SONG = ""  # no personal default — upload a file or type a path
 DIFF_OPTS = [2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 8.0]
 YEAR_OPTS = [2010, 2012, 2014, 2016, 2018, 2020, 2021, 2022, 2024]
 
@@ -87,7 +87,8 @@ def _run_one(audio_file, name, audio_bytes, *, difficulty, year,
 with st.sidebar:
     st.header("1 · Song")
     upload = st.file_uploader("Upload audio", type=["mp3", "wav", "ogg", "m4a", "flac"])
-    path = st.text_input("…or local path", value=DEFAULT_SONG)
+    path = st.text_input("…or local path", value=DEFAULT_SONG,
+                         placeholder="e.g. C:/Music/song.mp3")
 
     st.header("2 · Model — slow, needs Generate")
     difficulty = st.slider("Difficulty (star rating)", 1.0, 8.0, 4.0, 0.5,

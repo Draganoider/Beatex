@@ -56,7 +56,7 @@ def parse_hit_objects(osu_path: Path):
 
 
 def audio_duration_sec(audio_path: Path) -> float | None:
-    for probe in ("ffprobe", r"C:\FFmpeg\bin\ffprobe.exe"):
+    for probe in ("ffprobe",):  # must be on PATH
         try:
             out = subprocess.run(
                 [probe, "-v", "error", "-show_entries", "format=duration",

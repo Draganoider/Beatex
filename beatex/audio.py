@@ -16,7 +16,7 @@ def sha256_file(path, chunk: int = 1 << 20) -> str:
 
 def audio_duration_sec(path) -> float:
     """Duration via ffprobe (ffmpeg is a Beatex prerequisite). 0.0 if unavailable."""
-    for probe in ("ffprobe", r"C:\FFmpeg\bin\ffprobe.exe"):
+    for probe in ("ffprobe",):  # must be on PATH (a Beatex prerequisite)
         try:
             out = subprocess.run(
                 [probe, "-v", "error", "-show_entries", "format=duration",

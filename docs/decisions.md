@@ -26,7 +26,7 @@ Newest first. Each entry: what was decided, why, and what it rules out.
 **Rules out:** nothing structural; this is a docs/authoring convention only.
 
 ## 2026-06-18 — Beatex is a fresh, self-contained project
-**Decision:** Build in `C:\My programs\Beatex` as a new, **self-contained** project. **Copy** the small `beatmap-v1` schema/models into Beatex rather than importing from `Beat_Extractor` — no cross-repo Python dependency. The heavy Mapperatorinator model env stays isolated here too.
+**Decision:** Build Beatex as a new, **self-contained** project. **Copy** the small `beatmap-v1` schema/models into Beatex rather than importing from `Beat_Extractor` — no cross-repo Python dependency. The heavy Mapperatorinator model env stays isolated here too.
 **Why:** Cleanest separation; avoids two-venv / path-hack coupling between repos; keeps the model's Python 3.10 + CUDA env from contaminating anything else. `Beat_Extractor` remains a reference and a source to copy small pieces from (the schema now, the personalization tooling later).
 **Rules out:** importing `Beat_Extractor` as a live dependency; extending it in place.
 

@@ -11,7 +11,7 @@ osu! mappers place hit objects on the musically meaningful moments of a song —
 ## Target pipeline
 audio → Mapperatorinator osuT5 transformer (timing only; diffusion skipped) → parse hit-time tokens → flatten + density/strength shaping (difficulty knob) → `beatmap-v1` JSON → game. Optional later: a personalization re-ranker trained on the user's own taps/ratings. See `docs/architecture.md`.
 
-## Reused from prior work (`C:\My programs\Beat_Extractor`)
+## Reused from prior work (`Beat_Extractor`)
 - `beatmap-v1` JSON schema + Unity `BeatmapLoaderExample.cs` → keep as the output / integration format.
 - Tap-capture + rating + ranker tooling → future personalization layer.
 - `auto_determining` librosa detector → deterministic fallback when the model is unavailable.

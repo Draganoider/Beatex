@@ -2,7 +2,7 @@
 tags: [beatex, prior-work, reference]
 ---
 
-# Prior work — `C:\My programs\Beat_Extractor`
+# Prior work — `Beat_Extractor`
 
 The previous attempt at this problem. It works, but is bottlenecked on hand-labeled data. We keep its useful parts and replace its core.
 
