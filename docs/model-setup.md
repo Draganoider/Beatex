@@ -12,19 +12,22 @@ Reproducible steps that actually worked on this machine (RTX 5080, Windows 11, P
 - `git`, `ffmpeg`, `uv` already on PATH.
 
 ## Setup (one time)
+Run from the cloned **Beatex** root (uv downloads Python 3.10 itself).
 ```powershell
-# 1. Clone
-git clone --recurse-submodules https://github.com/OliBomby/Mapperatorinator.git "C:\My programs\Beatex\external\Mapperatorinator"
+# 1. Model env: clone Mapperatorinator into external/, isolated Python 3.10 venv
+git clone --recurse-submodules https://github.com/OliBomby/Mapperatorinator.git external/Mapperatorinator
+uv venv external/Mapperatorinator/.venv --python 3.10
 
-# 2. Isolated Python 3.10 venv (uv downloads 3.10 itself)
-uv venv "C:\My programs\Beatex\external\Mapperatorinator\.venv" --python 3.10
-
-# 3. Blackwell torch stack (cu130). NOTE: torchcodec is NOT installed on Windows
+# 2. Blackwell torch stack (cu130). torchcodec is omitted on Windows
 #    (0.10.0+cu130 has no Windows wheel and the code never imports it).
-uv pip install --python "<venv>\Scripts\python.exe" torch torchaudio --index-url https://download.pytorch.org/whl/cu130
+uv pip install --python external/Mapperatorinator/.venv torch torchaudio --index-url https://download.pytorch.org/whl/cu130
 
-# 4. Remaining deps, minus torchcodec (see external/Mapperatorinator/requirements-win.txt)
-uv pip install --python "<venv>\Scripts\python.exe" -r "C:\My programs\Beatex\external\Mapperatorinator\requirements-win.txt"
+# 3. Remaining model deps, minus torchcodec (this list ships with Beatex)
+uv pip install --python external/Mapperatorinator/.venv -r setup/mapperatorinator-requirements-win.txt
+
+# 4. App env: the Beatex package + UI deps
+uv venv .venv --python 3.12
+uv pip install --python .venv -e ".[app]"
 ```
 Result: `torch 2.12.1+cu130`, `torchaudio 2.11.0+cu130`. `torch.cuda.get_arch_list()` includes `sm_120`; device = `NVIDIA GeForce RTX 5080`, capability `(12, 0)`. (The README nominally asks for torch 2.10 / CUDA 13.0; cu130 currently serves 2.12.1 and it works fine.)
 

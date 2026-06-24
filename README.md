@@ -31,20 +31,40 @@ audio → Mapperatorinator V32 (timing only; positions/diffusion skipped)
 - **Shape** (instant, no model) re-derives the beatmap from the cached hit-times,
   so density/spacing/slider tweaks are real-time.
 
-## Install
+## Setup
 
-Two environments, kept separate on purpose:
+> Tested on **Windows 11 + an NVIDIA GPU**. The model env is heavy and isolated;
+> the app env is light. Linux/macOS work too, but the torch wheel index and venv
+> paths (`bin/` vs `Scripts/`) differ — adjust accordingly.
 
-1. **Model env** (heavy: Python 3.10 + Blackwell-capable PyTorch). One-time setup
-   and the exact commands are in [`docs/model-setup.md`](docs/model-setup.md).
-2. **App env** (light): the Beatex package + UI deps.
-   ```sh
-   uv venv .venv --python 3.12
-   uv pip install --python .venv -e ".[app]"
-   ```
+**Prerequisites:** [git](https://git-scm.com), [uv](https://docs.astral.sh/uv/),
+[ffmpeg](https://ffmpeg.org) on your `PATH`, and an NVIDIA GPU with a recent driver
+(Blackwell / RTX 50-series needs a CUDA-13-capable driver). No CUDA *toolkit*
+install is required — the PyTorch wheels bundle the runtime.
 
-Beatex finds the model env automatically at `external/Mapperatorinator` (override
-with `BEATEX_MODEL_DIR` / `BEATEX_MODEL_PYTHON`).
+```powershell
+# 1. Clone Beatex
+git clone https://github.com/Draganoider/Beatex.git
+cd Beatex
+
+# 2. Model env — clone Mapperatorinator into external/ and build its Python 3.10 venv
+git clone --recurse-submodules https://github.com/OliBomby/Mapperatorinator.git external/Mapperatorinator
+uv venv external/Mapperatorinator/.venv --python 3.10
+#    Blackwell torch stack (cu130). torchcodec is intentionally omitted on Windows
+#    (no wheel there, and the code never imports it).
+uv pip install --python external/Mapperatorinator/.venv torch torchaudio --index-url https://download.pytorch.org/whl/cu130
+uv pip install --python external/Mapperatorinator/.venv -r setup/mapperatorinator-requirements-win.txt
+
+# 3. App env — the Beatex package + UI deps
+uv venv .venv --python 3.12
+uv pip install --python .venv -e ".[app]"
+```
+
+The **first generate downloads the V32 weights** (safetensors — no pickle) and the
+Whisper base/small encoders from HuggingFace into `~/.cache/huggingface`. Beatex
+finds the model env automatically at `external/Mapperatorinator` (override with the
+`BEATEX_MODEL_DIR` / `BEATEX_MODEL_PYTHON` env vars). Full, verified runbook:
+[`docs/model-setup.md`](docs/model-setup.md).
 
 ## Use
 
