@@ -9,6 +9,7 @@ Launch:  double-click Beatex.bat   (or  .venv/Scripts/python app/qt_app.py)
 from __future__ import annotations
 
 import io
+import os
 import sys
 from pathlib import Path
 
@@ -26,12 +27,14 @@ from PyQt6.QtWidgets import (
 )
 
 from beatex.audio import audio_duration_sec
+from beatex.config import app_base_dir
 from beatex.osu_parse import parse_osu
 from beatex.pipeline import build_beatmap, extract
 from beatex.shape import ShapeParams
 from beatex.store import RunStore
 
-RUN_DIR = ROOT / "data" / "ui-runs"
+BASE = app_base_dir()  # repo root in dev; exe folder when frozen
+RUN_DIR = BASE / "data" / "ui-runs"
 PREVIEW = RUN_DIR / "_preview.mp3"
 
 
@@ -146,7 +149,7 @@ class BeatexWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Beatex — felt-beat extractor")
         self.resize(1120, 740)
-        self.store = RunStore(ROOT / "data" / "runs")
+        self.store = RunStore(BASE / "data" / "runs")
         RUN_DIR.mkdir(parents=True, exist_ok=True)
 
         self.parsed = self.audio_bytes = self.audio_name = self.run_meta = None
@@ -495,6 +498,9 @@ def main():
     app = QApplication(sys.argv)
     win = BeatexWindow()
     win.show()
+    if os.environ.get("BEATEX_SMOKE") == "1":  # headless launch check (CI/build)
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(400, app.quit)
     sys.exit(app.exec())
 
 

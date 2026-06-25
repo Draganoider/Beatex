@@ -100,6 +100,14 @@ thread so the UI stays responsive), shape live, **Build & Play** a synced previe
 **History** as the Streamlit app. To see startup errors, launch the console build:
 `.venv\Scripts\python app\qt_app.py`.
 
+**Or build a one-file `Beatex.exe`** launcher (no Python visible):
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build_exe.ps1
+```
+It produces `Beatex.exe` in the repo root. The exe bundles only the GUI, so
+generation still needs the model env + ffmpeg — keep `Beatex.exe` in the repo
+root so it finds `external/` and `data/`.
+
 ## Output: `beatmap-v1`
 
 ```json

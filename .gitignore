@@ -32,6 +32,10 @@ dist/
 *.osu
 *.osz
 
+# PyInstaller exe (built locally; too large + platform-specific to commit)
+/Beatex.exe
+*.spec
+
 # Obsidian per-user vault config
 docs/.obsidian/
 

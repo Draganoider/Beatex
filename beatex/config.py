@@ -8,12 +8,23 @@ the BEATEX_MODEL_DIR / BEATEX_MODEL_PYTHON environment variables.
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-# Beatex project root = parent of this package directory.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-DEFAULT_MODEL_DIR = PROJECT_ROOT / "external" / "Mapperatorinator"
+PACKAGE_DIR = Path(__file__).resolve().parent
+
+
+def app_base_dir() -> Path:
+    """Base dir for `external/` and `data/`.
+
+    In dev this is the repo root (parent of the beatex package). In a frozen
+    PyInstaller build, `__file__` lives inside the unpacked bundle, so we use the
+    folder that contains the executable instead (keep Beatex.exe in the repo root).
+    """
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return PACKAGE_DIR.parent
 
 
 def _venv_python(venv_dir: Path) -> Path:
@@ -45,7 +56,8 @@ class ModelConfig:
 
 
 def get_model_config() -> ModelConfig:
-    repo_dir = Path(os.environ.get("BEATEX_MODEL_DIR", str(DEFAULT_MODEL_DIR))).resolve()
+    default_model_dir = app_base_dir() / "external" / "Mapperatorinator"
+    repo_dir = Path(os.environ.get("BEATEX_MODEL_DIR", str(default_model_dir))).resolve()
     py_env = os.environ.get("BEATEX_MODEL_PYTHON")
     python = Path(py_env).resolve() if py_env else _venv_python(repo_dir / ".venv")
     return ModelConfig(repo_dir=repo_dir, python=python)
