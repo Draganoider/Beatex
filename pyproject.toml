@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "beatex"
-version = "0.1.0"
+version = "0.2.0"
 description = "Extract the best-possible beatmap (the hit timings a human would feel) from any song, by reusing Mapperatorinator's pretrained osu! timing model."
 readme = "README.md"
 requires-python = ">=3.10"

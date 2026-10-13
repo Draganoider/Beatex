@@ -18,7 +18,7 @@ from .schema import (
     make_event_id,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __all__ = [
     "VERSION",
     "BeatmapV1",
