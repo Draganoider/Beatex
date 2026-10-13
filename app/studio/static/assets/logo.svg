@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bx-g" gradientUnits="userSpaceOnUse" x1="11" y1="0" x2="54" y2="0">
+      <stop offset="0" stop-color="#2bd6c6"/>
+      <stop offset="0.55" stop-color="#7fd3b0"/>
+      <stop offset="1" stop-color="#ffb454"/>
+    </linearGradient>
+    <linearGradient id="bx-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16212e"/>
+      <stop offset="1" stop-color="#0a0f15"/>
+    </linearGradient>
+    <radialGradient id="bx-glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffd59a" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffb454" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bx-bg)"/>
+  <rect x="2.5" y="2.5" width="59" height="59" rx="14.5" fill="none" stroke="#ffffff" stroke-opacity="0.09"/>
+  <g fill="url(#bx-g)">
+    <rect x="11" y="34" width="5" height="10" rx="2.5"/>
+    <rect x="19" y="29" width="5" height="20" rx="2.5"/>
+    <rect x="27" y="23" width="5" height="32" rx="2.5"/>
+    <rect x="35" y="27" width="5" height="24" rx="2.5"/>
+    <rect x="43" y="32" width="5" height="14" rx="2.5"/>
+    <rect x="51" y="35" width="3" height="8" rx="1.5" opacity="0.7"/>
+  </g>
+  <circle cx="29.5" cy="13" r="8" fill="url(#bx-glow)"/>
+  <circle cx="29.5" cy="13" r="4.2" fill="none" stroke="#ffcf8a" stroke-width="2.2"/>
+  <circle cx="29.5" cy="13" r="1.6" fill="#fff4e0"/>
+</svg>

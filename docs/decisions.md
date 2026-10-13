@@ -6,6 +6,19 @@ tags: [beatex, decisions, log]
 
 Newest first. Each entry: what was decided, why, and what it rules out.
 
+## 2026-10-12 — Beatex Studio becomes the main UI
+**Outcome:** A new local web app, [[studio]] (`app/studio/`), replaces the Streamlit and PyQt UIs as the main way to use Beatex. It has a stdlib-only Python server with a JSON API and a sequential GPU job queue, plus a no-build HTML/CSS/JS front end. It runs in its own app window (`Beatex.bat` / `Beatex.exe` → Edge/Chrome `--app`; closing the window stops the server), in any browser, and in the Claude desktop app's browser pane (`.claude/launch.json`). New capabilities:
+- live click playback on one Web Audio clock, so shaping applies mid-song;
+- run-vs-run comparison lanes;
+- a rhythm-game preview;
+- **tap-along scoring** of every run of a song against your own taps;
+- a cancellable job queue with progress;
+- stars and notes on runs.
+
+**Why:** Streamlit reruns the whole script on every change, and its baked-mp3 preview had to be rebuilt after each tweak. The PyQt window was functional but plain. A web front end gives full control over the look and real-time audio. Keeping the server stdlib-only preserves the "core stays light" rule. Tap scoring is the first step toward the personalization layer in [[architecture]]: it measures "what you feel" directly and shows which difficulty matches it.
+**Also fixed:** the CLI failed on relative audio paths, because the model subprocess runs with cwd = its own repo; paths are now resolved to absolute. Model output is decoded as UTF-8 and unbuffered, so logs stream live and non-ASCII filenames are safe. Consoles are hidden under GUIs. The model process is killed if the caller errors.
+**Rules out:** further work on the Streamlit/PyQt UIs (kept as legacy, still functional).
+
 ## 2026-06-24 — Published to GitHub (public, MIT)
 **Outcome:** Live at https://github.com/Draganoider/Beatex (public, MIT), pushed via the gh CLI; remote `origin`, branch `main`. Initial commit + a fix for a Hydra crash on apostrophes in audio filenames (double-quote the override path values; Windows filenames can't contain `"`). `external/`, `data/`, and the venvs are gitignored, so no model weights and **none of the user's audio** are published. README badges + an Acknowledgements section credit Mapperatorinator (the upstream timing model) and mark Beatex as independent / not affiliated.
 **Convention:** commit messages follow the user's style — past-tense subject, no body, no trailers.

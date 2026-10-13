@@ -59,6 +59,8 @@ uv pip install --python external/Mapperatorinator/.venv -r setup/mapperatorinato
 uv venv .venv --python 3.12
 uv pip install --python .venv -e ".[app]"
 ```
+(Beatex Studio itself only needs the standard library. `numpy` and `pydub` from the
+`[app]` extra are used for the click-track mp3 export.)
 
 The **first generate downloads the V32 weights** (safetensors — no pickle) and the
 Whisper base/small encoders from HuggingFace into `~/.cache/huggingface`. Beatex
@@ -68,45 +70,39 @@ finds the model env automatically at `external/Mapperatorinator` (override with 
 
 ## Use
 
-CLI:
+### Beatex Studio (desktop app)
+
+**Double-click `Beatex.bat`.** Beatex Studio opens in its own window (no terminal),
+and closing the window stops it. It also runs in any browser
+(`python app/studio/server.py --open`), and in the Claude desktop app's browser
+pane via `.claude/launch.json`.
+
+- **Generate**: drop in a song, pick a difficulty and style year (or sweep several
+  difficulties). Runs queue on the GPU with live progress and can be cancelled.
+- **Shape live**: minimum spacing, accent boost, slider policy and timing offset
+  update instantly, even while the song plays.
+- **Listen**: the song and clicks run on one Web Audio clock, so clicks stay
+  sample-accurate. Choose beep/tick/wood/kick clicks, set volumes, play at
+  0.5×/0.75×/1×, and flip between runs of a song mid-playback.
+- **See it**: a zoomable waveform with strength-coloured hits, a density overview,
+  lanes comparing every run of the song, and a rhythm-game preview.
+- **Tap along**: tap the beats you feel. Beatex scores every run of the song against
+  your taps (precision, recall, F1, your timing bias) and points you to the best one.
+- **Export**: `beatmap-v1` JSON or a click-track mp3, saved to `data/exports/`.
+
+Details: [`docs/studio.md`](docs/studio.md). To build a one-file `Beatex.exe`
+launcher, run `powershell -ExecutionPolicy Bypass -File scripts/build_exe.ps1` (keep the
+exe in the repo root so it finds `external/` and `data/`).
+
+### CLI
 ```sh
 beatex extract "song.mp3" --difficulty 4 --year 2021 -o song.beatmap.json
 ```
 
-UI (tweak + visualize):
-```sh
-streamlit run app/streamlit_app.py
-```
-Pick a song and model settings, hit **Generate**, then play the waveform with hit
-markers, listen to synced clicks, balance the music/click volumes, adjust the
-shaping sliders live (including a global timing offset), and export the
-**beatmap-v1 JSON** or a **click-track mp3** (clicks baked into the song — a
-browser-latency-free alignment check). **Batch** mode sweeps several
-difficulties/years in one click. Every run is saved to a **History** panel (with
-the exact settings used) that you can reload and re-shape instantly — no model
-re-run — so you can compare difficulties/years/seeds. Run data lives under
-`data/` (audio is content-addressed by sha256, so the same song isn't duplicated
-across runs).
-
-### Desktop app (no terminal)
-
-Install the GUI deps once, then **double-click `Beatex.bat`**:
-```sh
-uv pip install --python .venv -e ".[gui]"
-```
-A native **PyQt6** window opens — pick a song, **Generate** (runs on a background
-thread so the UI stays responsive), shape live, **Build & Play** a synced preview
-(clicks baked into one stream), and save the JSON or mp3. It shares the same
-**History** as the Streamlit app. To see startup errors, launch the console build:
-`.venv\Scripts\python app\qt_app.py`.
-
-**Or build a one-file `Beatex.exe`** launcher (no Python visible):
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/build_exe.ps1
-```
-It produces `Beatex.exe` in the repo root. The exe bundles only the GUI, so
-generation still needs the model env + ffmpeg — keep `Beatex.exe` in the repo
-root so it finds `external/` and `data/`.
+### Older UIs
+The earlier Streamlit app (`streamlit run app/streamlit_app.py`) and PyQt6 window
+(`.venv/Scripts/python app/qt_app.py`, needs the `[gui]` extra) still work and share
+the same run history.
 
 ## Output: `beatmap-v1`
 

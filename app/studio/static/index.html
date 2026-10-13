@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Beatex Studio</title>
+  <meta name="description" content="Turn any song into the beatmap a human would feel.">
+  <meta name="theme-color" content="#0a0e14">
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/icon-256.png" type="image/png" sizes="256x256">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/css/studio.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <button class="icon-btn nav-toggle" id="navToggle" aria-label="Show library" data-icon="menu"></button>
+      <a class="brand" href="#" id="brand" aria-label="Beatex Studio home">
+        <img src="/assets/logo.svg" alt="" width="30" height="30">
+        <span class="wordmark">Beatex</span><span class="brand-tag">Studio</span>
+      </a>
+      <div class="topbar-spacer"></div>
+      <button class="health-pill" id="healthPill" title="Environment status">
+        <span class="dot"></span><span class="label">Checking setup…</span>
+      </button>
+      <button class="icon-btn" id="helpBtn" title="Keyboard shortcuts (?)" aria-label="Keyboard shortcuts" data-icon="keyboard"></button>
+      <button class="btn btn-primary" id="newBtn"><span data-icon="plus"></span><span class="hide-sm">New beatmap</span></button>
+    </header>
+
+    <aside class="sidebar" id="sidebar" aria-label="Library">
+      <div class="side-search">
+        <span data-icon="search"></span>
+        <input id="search" type="search" placeholder="Search songs" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="library" id="library"></div>
+      <section class="jobs" id="jobsPanel" hidden>
+        <header class="jobs-head">
+          <span class="section-label">Generation queue</span>
+          <button class="link-btn" id="clearJobs">Clear finished</button>
+        </header>
+        <div class="jobs-list" id="jobsList"></div>
+      </section>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="main" id="main">
+      <!-- Welcome / empty state -->
+      <section class="welcome" id="welcome">
+        <div class="hero">
+          <div class="hero-art" aria-hidden="true"></div>
+          <div class="hero-copy">
+            <span class="eyebrow">Felt-beat extraction</span>
+            <h1>Turn any song into the beats you <em>feel</em>.</h1>
+            <p>Beatex runs a model trained on thousands of human-made osu! maps over your track. It keeps only the hit timings, across drums, bass, vocals and melody, and gives you a game-ready <code>beatmap-v1</code>.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary btn-lg" id="heroNew"><span data-icon="upload"></span>Choose a song</button>
+              <span class="hint">…or drop an audio file anywhere</span>
+            </div>
+          </div>
+        </div>
+        <div class="setup-card" id="setupCard" hidden></div>
+        <div class="recent" id="recentWrap">
+          <div class="section-row">
+            <h2>Recent runs</h2>
+          </div>
+          <div class="recent-grid" id="recentGrid"></div>
+        </div>
+        <div class="how">
+          <div class="how-step"><span class="how-n">1</span><div><b>Generate</b><p>The model maps the song once on your GPU, in about a minute.</p></div></div>
+          <div class="how-step"><span class="how-n">2</span><div><b>Shape</b><p>Thin, accent and shift the hits. Changes apply instantly, while the song plays.</p></div></div>
+          <div class="how-step"><span class="how-n">3</span><div><b>Feel it</b><p>Listen with clicks, watch the game preview, tap along to score each run.</p></div></div>
+          <div class="how-step"><span class="how-n">4</span><div><b>Export</b><p>Save <code>beatmap-v1</code> JSON for Unity, or a click-track mp3.</p></div></div>
+        </div>
+      </section>
+
+      <!-- Workbench -->
+      <section class="workbench" id="workbench" hidden>
+        <div class="wb-stage">
+          <div class="wb-head">
+            <div class="song-art" id="songArt"></div>
+            <div class="wb-title">
+              <div class="wb-artist" id="songArtist"></div>
+              <h1 id="songTitle"></h1>
+              <div class="chips" id="runChips"></div>
+            </div>
+            <div class="wb-actions">
+              <button class="icon-btn" id="starBtn" title="Star this run (S)" aria-label="Star this run" data-icon="star"></button>
+              <button class="btn" id="moreRunsBtn" title="Generate more runs of this song"><span data-icon="sparkles"></span><span class="hide-sm">New run</span></button>
+              <button class="icon-btn danger" id="deleteRunBtn" title="Delete this run" aria-label="Delete this run" data-icon="trash"></button>
+            </div>
+          </div>
+
+          <div class="run-switch" id="runSwitch" role="tablist" aria-label="Runs of this song"></div>
+
+          <div class="stats" id="stats"></div>
+
+          <div class="card timeline-card">
+            <div class="card-head">
+              <span class="card-title">Timeline</span>
+              <div class="tl-tools">
+                <button class="tool-btn" id="compareBtn" title="Show the other runs of this song as lanes (C)"><span data-icon="layers"></span><span class="hide-md">Compare</span></button>
+                <button class="tool-btn" id="tapBtn" title="Tap along to score the runs (T)"><span data-icon="hand"></span><span class="hide-md">Tap along</span></button>
+                <span class="tool-sep"></span>
+                <button class="tool-btn icon" id="zoomOut" title="Zoom out (−)" aria-label="Zoom out" data-icon="zoomOut"></button>
+                <button class="tool-btn icon" id="zoomIn" title="Zoom in (+)" aria-label="Zoom in" data-icon="zoomIn"></button>
+                <button class="tool-btn" id="followBtn" title="Keep the playhead in view (F)"><span data-icon="crosshair"></span><span class="hide-md">Follow</span></button>
+              </div>
+            </div>
+            <div class="tap-banner" id="tapBanner" hidden>
+              <span class="rec-dot"></span>
+              <div class="tap-banner-text"><b>Recording taps</b><span>Tap <kbd>D</kbd> <kbd>F</kbd> <kbd>J</kbd> <kbd>K</kbd> or click the game view on every beat you feel. Clicks are muted.</span></div>
+              <span class="tap-count" id="tapCount">0 taps</span>
+              <button class="btn btn-sm" id="tapCancel">Cancel</button>
+              <button class="btn btn-sm btn-primary" id="tapStop">Stop &amp; score</button>
+            </div>
+            <div class="overview-wrap"><canvas id="overview" height="56"></canvas></div>
+            <div class="detail-wrap" id="detailWrap">
+              <canvas id="detail"></canvas>
+              <div class="tl-tooltip" id="tlTooltip" hidden></div>
+              <div class="tl-loading" id="tlLoading" hidden><span class="spinner"></span><span id="tlLoadingText">Decoding audio…</span></div>
+            </div>
+            <div class="transport">
+              <button class="icon-btn" id="toStart" title="Back to start (Home)" aria-label="Back to start" data-icon="skipBack"></button>
+              <button class="play-btn" id="playBtn" title="Play / pause (Space)" aria-label="Play"><span data-icon="play"></span></button>
+              <div class="time"><span id="timeNow">0:00.0</span><span class="time-sep">/</span><span id="timeDur">0:00</span></div>
+              <div class="transport-spacer"></div>
+              <div class="seg seg-sm" id="rateSeg" role="radiogroup" aria-label="Playback speed">
+                <button data-v="0.5">0.5×</button><button data-v="0.75">0.75×</button><button data-v="1" class="on">1×</button>
+              </div>
+              <button class="tool-btn" id="clicksBtn" title="Clicks on/off (M)"><span data-icon="metronome"></span><span class="hide-md">Clicks</span></button>
+            </div>
+          </div>
+
+          <div class="card game-card">
+            <div class="card-head">
+              <span class="card-title">Game preview</span>
+              <span class="card-sub">How the hits would land in a rhythm game</span>
+            </div>
+            <div class="game-wrap" id="gameWrap"><canvas id="game"></canvas></div>
+          </div>
+        </div>
+
+        <aside class="inspector" id="inspector">
+          <div class="card">
+            <div class="card-head">
+              <span class="card-title">Shape</span>
+              <span class="card-sub">instant, no model run</span>
+              <button class="link-btn" id="shapeReset">Reset</button>
+            </div>
+            <div class="field">
+              <label>Sliders &amp; holds</label>
+              <div class="seg" id="policySeg">
+                <button data-v="head_tail">Head + tail</button><button data-v="head">Head only</button>
+              </div>
+            </div>
+            <div class="field row">
+              <label for="spinners">Include spinners</label>
+              <label class="switch"><input type="checkbox" id="spinners"><span></span></label>
+            </div>
+            <div class="field">
+              <div class="field-top"><label for="minSpacing">Minimum spacing</label><output id="minSpacingOut"></output></div>
+              <input type="range" id="minSpacing" min="0" max="500" step="10">
+              <div class="field-help">Thins dense passages. Stronger hits win.</div>
+            </div>
+            <div class="field">
+              <div class="field-top"><label for="accent">Accent boost</label><output id="accentOut"></output></div>
+              <input type="range" id="accent" min="0" max="0.5" step="0.05">
+              <div class="field-help">Extra strength for the model's phrase starts (new combos).</div>
+            </div>
+            <div class="field">
+              <div class="field-top"><label for="offset">Timing offset</label><output id="offsetOut"></output></div>
+              <div class="nudge">
+                <button class="icon-btn sm" data-nudge="-5" aria-label="5 ms earlier" data-icon="minus"></button>
+                <input type="range" id="offset" min="-150" max="150" step="1" data-center>
+                <button class="icon-btn sm" data-nudge="5" aria-label="5 ms later" data-icon="plus"></button>
+              </div>
+              <div class="field-help">Shifts every hit earlier (−) or later (+). Included in exports.</div>
+            </div>
+            <div class="breakdown" id="breakdown"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><span class="card-title">Listen</span></div>
+            <div class="field">
+              <label>Click sound</label>
+              <div class="seg" id="soundSeg">
+                <button data-v="beep">Beep</button><button data-v="tick">Tick</button><button data-v="wood">Wood</button><button data-v="kick">Kick</button>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-top"><label for="musicVol">Music</label><output id="musicVolOut"></output></div>
+              <input type="range" id="musicVol" min="0" max="1" step="0.01">
+            </div>
+            <div class="field">
+              <div class="field-top"><label for="clickVol">Clicks</label><output id="clickVolOut"></output></div>
+              <input type="range" id="clickVol" min="0" max="1.5" step="0.01">
+            </div>
+          </div>
+
+          <div class="card" id="tapCard">
+            <div class="card-head"><span class="card-title">Tap score</span><button class="link-btn" id="tapClear" hidden>Clear takes</button></div>
+            <div id="tapScore"></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><span class="card-title">Export</span></div>
+            <div class="export-grid">
+              <button class="export-btn" id="expJson">
+                <span class="export-ico" data-icon="braces"></span>
+                <span><b>beatmap-v1 JSON</b><small>For Unity and other games</small></span>
+              </button>
+              <button class="export-btn" id="expMp3">
+                <span class="export-ico" data-icon="music"></span>
+                <span><b>Click-track mp3</b><small>Song with the clicks mixed in</small></span>
+              </button>
+            </div>
+            <div class="field row compact">
+              <label for="mp3ClicksOnly">mp3: clicks only</label>
+              <label class="switch"><input type="checkbox" id="mp3ClicksOnly"><span></span></label>
+            </div>
+            <div class="export-actions">
+              <button class="link-btn" id="copyJson"><span data-icon="copy"></span>Copy JSON</button>
+              <button class="link-btn" id="openExports"><span data-icon="folder"></span>Open exports folder</button>
+            </div>
+            <div class="export-last" id="exportLast" hidden></div>
+          </div>
+
+          <div class="card">
+            <div class="card-head"><span class="card-title">Run details</span></div>
+            <dl class="details" id="runDetails"></dl>
+            <label class="note-label" for="runNote">Notes</label>
+            <textarea id="runNote" rows="3" placeholder="How does this run feel? (saved automatically)"></textarea>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-root" id="modalRoot"></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="drop-overlay" id="dropOverlay"><div><span data-icon="upload"></span><b>Drop to create a beatmap</b><small>mp3 · wav · ogg · m4a · flac</small></div></div>
+  <input type="file" id="fileInput" accept=".mp3,.wav,.ogg,.m4a,.flac,audio/*" hidden>
+
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>
