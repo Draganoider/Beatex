@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from .pipeline import extract
@@ -9,6 +10,9 @@ from .shape import ShapeParams
 
 
 def main(argv=None) -> int:
+    # The model's tqdm bars use block characters a cp1252 console can't encode.
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="replace")
     ap = argparse.ArgumentParser(
         prog="beatex",
         description="Extract a beatmap-v1 JSON (felt hit timings) from a song.",

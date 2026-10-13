@@ -22,6 +22,7 @@ def audio_duration_sec(path) -> float:
                 [probe, "-v", "error", "-show_entries", "format=duration",
                  "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
                 capture_output=True, text=True, check=True,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
             )
             return float(out.stdout.strip())
         except (FileNotFoundError, subprocess.CalledProcessError, ValueError):

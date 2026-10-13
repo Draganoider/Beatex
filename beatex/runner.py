@@ -7,6 +7,7 @@ give us timing-only output, so no overrides are needed for that.
 """
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
@@ -30,15 +31,22 @@ def run_inference(
     extra_overrides: list[str] | None = None,
     model_cfg: ModelConfig | None = None,
     on_log=None,
+    on_proc=None,
 ) -> Path:
-    """Run inference and return the path to the produced .osu file."""
+    """Run inference and return the path to the produced .osu file.
+
+    `on_proc(proc)` is called with the Popen handle once the model starts, so a
+    caller (the Studio job queue) can cancel a run by killing it.
+    """
     model = model_cfg or get_model_config()
     model.validate()
 
-    audio_path = Path(audio_path)
+    # Absolute paths: the model runs with cwd=its own repo, so relative paths
+    # given to the CLI would otherwise resolve against the wrong directory.
+    audio_path = Path(audio_path).resolve()
     if not audio_path.exists():
         raise FileNotFoundError(f"Audio not found: {audio_path}")
-    output_dir = Path(output_dir)
+    output_dir = Path(output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     before = _osu_names(output_dir)
@@ -65,20 +73,33 @@ def run_inference(
 
     cmd = [str(model.python), "inference.py", *overrides]
     log: list[str] = []
+    # Unbuffered UTF-8 output so the log streams live and non-ASCII filenames
+    # don't break decoding; no console window when launched from a GUI.
+    env = {**os.environ, "PYTHONUNBUFFERED": "1", "PYTHONIOENCODING": "utf-8"}
     proc = subprocess.Popen(
         cmd,
         cwd=str(model.repo_dir),
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         bufsize=1,
+        env=env,
+        creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
     )
+    if on_proc:
+        on_proc(proc)
     assert proc.stdout is not None
-    for line in proc.stdout:
-        log.append(line)
-        if on_log:
-            on_log(line.rstrip("\n"))
-    proc.wait()
+    try:
+        for line in proc.stdout:
+            log.append(line)
+            if on_log:
+                on_log(line.rstrip("\n"))
+        proc.wait()
+    except BaseException:
+        proc.kill()  # never leave an orphaned model process on the GPU
+        raise
 
     if proc.returncode != 0:
         raise RuntimeError(

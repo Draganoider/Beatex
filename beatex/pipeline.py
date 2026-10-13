@@ -52,6 +52,7 @@ def extract(
     super_timing: bool = False,
     seed: int | None = None,
     on_log=None,
+    on_proc=None,
 ) -> tuple[BeatmapV1, ParsedOsu, Path]:
     """Full run: model -> parse -> shape. Returns (beatmap, parsed, osu_path).
 
@@ -63,7 +64,8 @@ def extract(
     osu_path = run_inference(
         audio_path, out_dir,
         difficulty=difficulty, year=year, gamemode=gamemode,
-        cfg_scale=cfg_scale, super_timing=super_timing, seed=seed, on_log=on_log,
+        cfg_scale=cfg_scale, super_timing=super_timing, seed=seed,
+        on_log=on_log, on_proc=on_proc,
     )
     parsed = parse_osu(osu_path)
     beatmap = build_beatmap(
