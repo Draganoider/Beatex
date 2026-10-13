@@ -14,8 +14,9 @@ keywords = ["beatmap", "rhythm", "osu", "music", "onset", "timing", "games"]
 dependencies = []
 
 [project.optional-dependencies]
-app = ["streamlit>=1.40", "pandas>=2.0", "numpy>=1.26", "pydub>=0.25"]
-gui = ["PyQt6>=6.6", "numpy>=1.26", "pydub>=0.25"]
+# Beatex Studio itself is stdlib-only; numpy + pydub power the click-track mp3 export.
+app = ["numpy>=1.26", "pydub>=0.25"]
+build = ["pyinstaller>=6.0"]
 tools = ["numpy>=1.26", "pydub>=0.25"]
 
 [project.scripts]

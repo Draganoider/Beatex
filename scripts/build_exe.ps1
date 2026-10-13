@@ -1,6 +1,6 @@
 # Build Beatex.exe, a double-click launcher for Beatex Studio.
 #
-# Run from the repo root, inside the app venv (needs: pip install pyinstaller):
+# Run from the repo root (needs the build extra: uv pip install --python .venv -e ".[app,build]"):
 #     .\scripts\build_exe.ps1
 #
 # The exe bundles the Studio server + UI (no Python needed to start it) and
