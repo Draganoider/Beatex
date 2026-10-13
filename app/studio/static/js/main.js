@@ -15,7 +15,7 @@ const PREFS_KEY = 'beatex.studio.v1';
 const DEFAULT_SHAPE = { policy: 'head_tail', spinners: false, min_spacing: 0, accent: 0.3, offset: 0 };
 const DEFAULT_PREFS = {
   shape: DEFAULT_SHAPE, sound: 'beep', musicVol: 0.8, clickVol: 0.9, clicks: true, compare: true,
-  follow: true, rate: 1, mp3ClicksOnly: false, lastRun: null, genRatio: 2.4, expanded: [],
+  follow: true, rate: 1, mp3ClicksOnly: false, lastRun: null, genRatio: 0.9, expanded: [],
   newDiff: 4, newYear: 2021,
 };
 
@@ -620,8 +620,9 @@ async function onJobsFinished(list) {
   let reshaped = false;
   for (const j of list) {
     const r = runById(j.run_id);
-    if (r && j.started_ts && j.finished_ts && r.duration_sec > 20) {
-      prefs.genRatio = prefs.genRatio * 0.5 + ((j.finished_ts - j.started_ts) / r.duration_sec) * 0.5;
+    if (r && j.started_ts && j.finished_ts && r.duration_sec > 20) {  // learn this GPU's speed
+      const ratio = Math.max(0.2, (j.finished_ts - j.started_ts - GEN_OVERHEAD) / r.duration_sec);
+      prefs.genRatio = prefs.genRatio * 0.5 + ratio * 0.5;
       savePrefs();
     }
     const title = splitTitle(j.filename).title;
@@ -720,6 +721,7 @@ function openLogModal(id) {
 
 // ------------------------------------------------------------------ new beatmap
 const DIFFS = [2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7];
+const GEN_OVERHEAD = 20;  // seconds per run to start the model process and load weights
 
 function diffDesc(d) {
   if (d <= 2) return 'Sparse: only the strongest beats';
@@ -799,7 +801,7 @@ function openNewModal({ file = null, sha = null } = {}) {
 
   function estimate() {
     const dur = st.song?.duration_sec || 180;
-    let s = dur * prefs.genRatio + 15;
+    let s = dur * prefs.genRatio + GEN_OVERHEAD;
     if (st.cfg > 1) s *= 1.8;
     if (st.superTiming) s *= 3;
     return s;
@@ -897,7 +899,8 @@ function openNewModal({ file = null, sha = null } = {}) {
       savePrefs();
       const est = fmtDuration(estimate() * jobs.length);
       m.close();
-      toast(jobs.length > 1 ? `Queued ${jobs.length} runs` : 'Generating', `${splitTitle(st.song.filename).title} · about ${est}. Progress is in the sidebar.`, { kind: 'ok', timeout: 6000 });
+      const bg = S.health?.app_mode ? ' You can close Beatex; it finishes in the background.' : '';
+      toast(jobs.length > 1 ? `Queued ${jobs.length} runs` : 'Generating', `${splitTitle(st.song.filename).title} · about ${est}. Progress is in the sidebar.${bg}`, { kind: 'ok', timeout: 7000 });
       pollJobs();
     } catch (e) {
       toast('Could not start generation', e.message, { kind: 'err' });
@@ -1310,12 +1313,6 @@ async function init() {
   ro.observe($('#gameWrap'));
 
   window.addEventListener('pagehide', () => api.bye());
-  window.addEventListener('beforeunload', (e) => {
-    if (S.health?.app_mode && S.jobs.some((j) => j.status === 'running' || j.status === 'queued')) {
-      e.preventDefault();
-      e.returnValue = '';
-    }
-  });
 
   await Promise.all([refreshHealth(), refreshRuns()]);
   pollJobs();

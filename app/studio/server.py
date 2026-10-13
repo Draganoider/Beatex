@@ -10,7 +10,8 @@ the GPU), instant shaping, tap-along takes and exports.
 
 It also runs inside the Claude desktop app's browser pane (.claude/launch.json).
 Only binds to 127.0.0.1. numpy/pydub are needed only for the click-track mp3
-export (the [app]/[gui] extras); everything else is stdlib.
+export (the [app] extra); everything else is stdlib. BEATEX_DATA_DIR points it at
+another library (default: <repo>/data).
 """
 from __future__ import annotations
 
@@ -50,7 +51,7 @@ from beatex.store import RunMeta, RunStore  # noqa: E402
 
 STATIC = (Path(sys._MEIPASS) / "studio_static") if FROZEN else Path(__file__).resolve().parent / "static"
 BASE = app_base_dir()
-DATA = BASE / "data"
+DATA = Path(os.environ["BEATEX_DATA_DIR"]).resolve() if os.environ.get("BEATEX_DATA_DIR") else BASE / "data"
 SRC_DIR = DATA / "ui-runs"        # model-input copies of the audio (shared with the old UIs)
 OSU_DIR = SRC_DIR / "osu"         # raw model output
 EXPORT_DIR = DATA / "exports"
@@ -380,12 +381,18 @@ jobs = JobQueue()
 
 # ------------------------------------------------------------------ app-window mode
 class _AppMode:
-    """When launched with --app: quit once the Studio window is gone."""
+    """When launched with --app: quit once the Studio window is gone.
+
+    Queued/running generations are allowed to finish first (they are saved to
+    the library), so closing the window never throws away a model run.
+    Reopening Beatex while that happens reconnects to this server.
+    """
 
     def __init__(self):
         self.enabled = False
         self.server: ThreadingHTTPServer | None = None
         self._bye_at: float | None = None
+        self._quitting = False
         self._lock = threading.Lock()
 
     def seen(self) -> None:
@@ -406,9 +413,21 @@ class _AppMode:
             self.quit()
 
     def quit(self) -> None:
-        jobs.cancel_all()
+        with self._lock:
+            if self._quitting:
+                return
+            self._quitting = True
+        threading.Thread(target=self._finish_then_stop, daemon=True).start()
+
+    def _finish_then_stop(self) -> None:
+        while jobs.busy():
+            time.sleep(2.0)
+            with self._lock:
+                if self._bye_at is None:  # a window reconnected: stay up
+                    self._quitting = False
+                    return
         if self.server:
-            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            self.server.shutdown()
 
 
 APP_MODE = _AppMode()
