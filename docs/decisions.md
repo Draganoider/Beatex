@@ -6,6 +6,17 @@ tags: [beatex, decisions, log]
 
 Newest first. Each entry: what was decided, why, and what it rules out.
 
+## 2026-10-12 — Legacy UIs removed; GitHub page + one-command setup
+**Outcome:** At the user's request, `app/streamlit_app.py`, `app/waveform.py` and `app/qt_app.py` are deleted. [[studio]] is the only UI, and the `[app]` extra is now just numpy + pydub (Streamlit, pandas and PyQt6 are gone). Other changes:
+- Closing the app window **no longer cancels generations**: the server finishes the queue, then exits.
+- New `scripts/setup.ps1` (idempotent one-command Windows setup with CUDA auto-pick).
+- New `tools/demo_track.py` (royalty-free synthesized songs).
+- `BEATEX_DATA_DIR` lets the Studio use a separate library.
+- The README is rebuilt around real Studio screenshots and an animated WebP, captured from a demo library of synthesized songs so none of the user's music appears publicly, plus a banner and a social-preview image (`docs/images/`).
+- GitHub issue templates are added.
+
+**Why:** The user wants the GitHub page to attract users. Setup friction (two venvs + a CUDA PyTorch build) is the biggest barrier, so it is reduced to one command.
+
 ## 2026-10-12 — Beatex Studio becomes the main UI
 **Outcome:** A new local web app, [[studio]] (`app/studio/`), replaces the Streamlit and PyQt UIs as the main way to use Beatex. It has a stdlib-only Python server with a JSON API and a sequential GPU job queue, plus a no-build HTML/CSS/JS front end. It runs in its own app window (`Beatex.bat` / `Beatex.exe` → Edge/Chrome `--app`; closing the window stops the server), in any browser, and in the Claude desktop app's browser pane (`.claude/launch.json`). New capabilities:
 - live click playback on one Web Audio clock, so shaping applies mid-song;

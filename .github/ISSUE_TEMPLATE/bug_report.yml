@@ -1,0 +1,28 @@
+name: Bug report
+description: Something in Beatex (Studio, CLI or setup) doesn't work.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log or error
+      description: In Beatex Studio, open the job's **Log** from the generation queue and paste the end of it here.
+      render: text
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      description: OS, GPU, and what the Studio's status pill / Environment dialog shows.
+      placeholder: Windows 11, RTX 4070, "Model ready"
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options: [Beatex Studio, CLI, setup.ps1 / installation, Exported beatmap / game integration]

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Mapperatorinator (the timing model Beatex builds on)
+    url: https://github.com/OliBomby/Mapperatorinator
+    about: Questions about the underlying model itself belong upstream.

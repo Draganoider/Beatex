@@ -1,0 +1,15 @@
+name: Idea or feature request
+description: Suggest something that would make Beatex better for your game or workflow.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: What are you building?
+      description: The game or project you'd use it for helps us prioritise (engine, genre, platform).
